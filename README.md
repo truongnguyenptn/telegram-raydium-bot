@@ -25,8 +25,8 @@ Each pool will include basic information such as: token pair, liquidity, 24h vol
 Clone the repository and install dependencies:
 
 ```bash
-git clone https://github.com/yourusername/your-repo.git
-cd your-repo
+git clone https://github.com/truongnguyenptn/telegram-raydium-bot
+cd telegram-raydium-bot
 npm install
 ```
 
