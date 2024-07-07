@@ -5,4 +5,4 @@ export const POOL_TYPES = {
   CONCENTRATED: 'concentrated-pools'
 };
 
-export const CONTEXT_OPTIONS = { reply_markup: 'markdown' }
+export const CONTEXT_OPTIONS = { reply_markup: 'markdown', parse_mode: "HTML" }

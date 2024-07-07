@@ -11,6 +11,5 @@ import { fetchPoolsByType } from '../utils/index.js';
  * @returns {Promise<void>}
  */
 export default async function allPools(page = 1, pageSize = 5) {
-  const message = await fetchPoolsByType('all', page, pageSize)
-  return message;
+  return await fetchPoolsByType('all', page, pageSize)
 }

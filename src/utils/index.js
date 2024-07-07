@@ -1,5 +1,5 @@
 import { fetchPools } from '../services/raydiumService.js';
-import { getAddressExplorerLink, getAddPoolLink } from '../utils/helper/index.js';
+import { getAddressExplorerLink, getAddPoolLink, escapeMarkdown } from '../utils/helper/index.js';
 
 /**
  * Represents a pool mint details.
@@ -93,6 +93,7 @@ export async function fetchPoolsByType(poolType, page = 1, pageSize = 10) {
     const response = await fetchPools(url)
     const pools = response.data.data;
 
+    const hasNextPage = response.data.hasNextPage;
     // Construct message with pool details
     let items = [];
     let title = '';
@@ -118,7 +119,9 @@ export async function fetchPoolsByType(poolType, page = 1, pageSize = 10) {
 
 
     // Sending message with Markdown format for icons
-    return items.join('\n');
+    return {
+      items: items.join('\n'), hasNextPage
+    };
   } catch (error) {
     console.error(`Failed to fetch ${poolType} pools:`, error);
   }
@@ -145,15 +148,15 @@ export function generateLink(baseUrl, queryParams) {
  * @returns {string} Formatted pool details as a string.
  */
 export function getPoolDetails(pool, poolType) {
-  const iconA = pool.mintA.address ? `[${pool.mintA.symbol}](${getAddressExplorerLink(pool.mintA.address)})` : pool.mintA.symbol;
-  const iconB = pool.mintB.address ? `[${pool.mintB.symbol}](${getAddressExplorerLink(pool.mintB.address)})` : pool.mintB.symbol;
-  const addPoolLink = getAddPoolLink(pool.id);
+  const iconA = pool.mintA.address ? `[${escapeMarkdown(pool.mintA.symbol)}](${escapeMarkdown(getAddressExplorerLink(pool.mintA.address))})` : escapeMarkdown(pool.mintA.symbol);
+  const iconB = pool.mintB.address ? `[${escapeMarkdown(pool.mintB.symbol)}](${escapeMarkdown(getAddressExplorerLink(pool.mintB.address))})` : escapeMarkdown(pool.mintB.symbol);
+  const addPoolLink = escapeMarkdown(getAddPoolLink(pool.id));
 
-  let message = `⚖️ ${pool.mintA.name} (${iconA}) ↔️ ${pool.mintB.name} (${iconB}) \n`;
-  message += `💧 Liquidity: ${pool.tvl.toFixed(2)}💰\n`;
-  message += `💥 24h Volume: ${pool.day.volume.toFixed(2)}💰\n`;
-  message += `💸 24h Fee: ${pool.feeRate * 100}%\n`;
-  message += `🏦 24h APR: ${pool.day.apr.toFixed(2)}%\n`;
+  let message = `⚖️ ${escapeMarkdown(pool.mintA.name)} \\(${iconA}\\) ↔️ ${escapeMarkdown(pool.mintB.name)} \\(${iconB}\\) \n`;
+  message += `💧 Liquidity: ${escapeMarkdown(pool.tvl.toFixed(2))}💰\n`;
+  message += `💥 24h Volume: ${escapeMarkdown(pool.day.volume.toFixed(2))}💰\n`;
+  message += `💸 24h Fee: ${escapeMarkdown((pool.feeRate * 100).toFixed(2))}%\n`;
+  message += `🏦 24h APR: ${escapeMarkdown(pool.day.apr.toFixed(2))}%\n`;
   message += `🔗 [Add liquidity to this pool](${addPoolLink})\n\n`;
 
   return message;

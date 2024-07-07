@@ -17,8 +17,8 @@ console.log('Bot is starting...');
 bot.command('all_pools', async (ctx) => {
   console.log('Received /all-pools command');
   try {
-    const pools = await allPools(1, 5); // Fetch first 5 pools
-    ctx.reply(pools, getPagination({ command: POOL_TYPES.ALL }));
+    const { items, hasNextPage } = await allPools(); // Fetch first 5 pools
+    ctx.reply(items, { ...getPagination({ command: POOL_TYPES.ALL }), parse_mode: 'MarkdownV2' });
   } catch (error) {
     console.error('Error fetching all pools:', error);
     ctx.reply('Error fetching all pools. Please try again later.');
@@ -28,8 +28,8 @@ bot.command('all_pools', async (ctx) => {
 bot.command('concentrated_pools', async (ctx) => {
   console.log('Received /concentrated-pools command');
   try {
-    const pools = await concentratedPools(1, 5); // Example: Fetch first 5 pools
-    ctx.reply(pools, getPagination({ command: POOL_TYPES.CONCENTRATED }));
+    const { items, hasNextPage } = await concentratedPools(); // Example: Fetch first 5 pools
+    ctx.reply(items, { ...getPagination({ command: POOL_TYPES.CONCENTRATED }), parse_mode: 'MarkdownV2' });
   } catch (error) {
     console.error('Error fetching concentrated pools:', error);
     ctx.reply('Error fetching concentrated pools. Please try again later.');
@@ -39,8 +39,8 @@ bot.command('concentrated_pools', async (ctx) => {
 bot.command('standard_pools', async (ctx) => {
   console.log('Received /standard-pools command');
   try {
-    const pools = await standardPools(1, 5); // Example: Fetch first 5 pools
-    ctx.reply(pools, getPagination({ command: POOL_TYPES.STANDARD }));
+    const { items, hasNextPage } = await standardPools(); // Example: Fetch first 5 pools
+    ctx.reply(items, { ...getPagination({ command: POOL_TYPES.STANDARD }), parse_mode: 'MarkdownV2' });
   } catch (error) {
     console.error('Error fetching standard pools:', error);
     ctx.reply('Error fetching standard pools. Please try again later.');
@@ -48,12 +48,12 @@ bot.command('standard_pools', async (ctx) => {
 });
 
 // Handle callback queries for pagination
-bot.on('callback_query', async (callbackQuery) => {
+bot.on('callback_query', async (ctx) => {
   try {
-    const data = callbackQuery.update.callback_query.data.split('_');
+    const data = ctx.callbackQuery.data.split('_');
     const command = data[0];
-    const page = parseInt(data[1]);
-    await editMessage(callbackQuery, command, page);
+    const page = parseInt(data[1], 10);
+    await editMessage(ctx, command, page);
   } catch (error) {
     console.error('Error handling callback query:', error);
   }
@@ -61,7 +61,7 @@ bot.on('callback_query', async (callbackQuery) => {
 
 // Default start command
 bot.start((ctx) => {
-  ctx.reply('Hello! I am your Telegram bot.');
+  ctx.reply('Hello! I am your Raydium Telgram bot.');
 });
 
 // Launch the bot
@@ -75,27 +75,29 @@ bot.launch().then(() => {
 async function editMessage(ctx, command, current) {
   try {
     let pools;
+    let hasNextPage;
+
     switch (command) {
       case POOL_TYPES.ALL:
-        pools = await allPools(current); // Fetch pools for specific page
+        ({ items: pools, hasNextPage } = await allPools(current)); // Fetch pools for specific page
         break;
       case POOL_TYPES.CONCENTRATED:
-        pools = await concentratedPools(current); // Fetch pools for specific page
+        ({ items: pools, hasNextPage } = await concentratedPools(current)); // Fetch pools for specific page
         break;
       case POOL_TYPES.STANDARD:
-        pools = await standardPools(current); // Fetch pools for specific page
+        ({ items: pools, hasNextPage } = await standardPools(current)); // Fetch pools for specific page
         break;
       default:
         return;
     }
 
-    const maxPage = 10; // Example: Total pages available
+    const maxPage = hasNextPage ? current + 1 : current; // Example: Total pages available
     const pagination = getPagination({ current, maxPage, command });
 
-    if (ctx.update.callback_query) {
-      await ctx.editMessageText(pools, pagination); // Edit existing message
+    if (ctx.update?.callback_query) {
+      await ctx.editMessageText(pools, { ...pagination, parse_mode: 'MarkdownV2' });
     } else {
-      await ctx.reply(pools, pagination); // Reply with new message
+      await ctx.reply(pools, { ...pagination, parse_mode: 'MarkdownV2' });
     }
   } catch (error) {
     console.error('Error editing or sending message:', error);

@@ -10,3 +10,7 @@ export function getAddPoolLink(poolId) {
 export function getAddressExplorerLink(address) {
   return `https://explorer.solana.com/address/${address}`;
 }
+
+export function escapeMarkdown(text) {
+  return text.replace(/([_*\[\]()~`>#+\-=|{}.!\\])/g, '\\$1');
+}

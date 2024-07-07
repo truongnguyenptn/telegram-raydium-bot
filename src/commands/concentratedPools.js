@@ -11,6 +11,5 @@ import { fetchPoolsByType } from '../utils/index.js';
  * @returns {Promise<void>}
  */
 export default async function concentratedPools(page = 1, pageSize = 5) {
-  const message = await fetchPoolsByType('concentrated', page, pageSize)
-  return message;
+  return await fetchPoolsByType('concentrated', page, pageSize)
 }
