@@ -1,0 +1,16 @@
+{
+  "name": "telegram-raydium-bot",
+  "version": "1.0.0",
+  "description": "A Telegram bot interacting with Raydium",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "node-fetch": "^3.3.2",
+    "node-telegram-bot-api": "^0.66.0",
+    "nodemon": "^3.1.4"
+  }
+}
