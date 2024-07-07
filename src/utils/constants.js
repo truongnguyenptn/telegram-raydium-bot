@@ -1,6 +1,8 @@
 // Constants for pool types
-const PoolTypes = {
-  ALL: 'all',
-  STANDARD: 'standard',
-  CONCENTRATED: 'concentrated'
+export const POOL_TYPES = {
+  ALL: 'all-pools',
+  STANDARD: 'standard-pools',
+  CONCENTRATED: 'concentrated-pools'
 };
+
+export const CONTEXT_OPTIONS = { reply_markup: 'markdown' }

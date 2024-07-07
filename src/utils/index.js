@@ -76,7 +76,7 @@ import { getAddressExplorerLink, getAddPoolLink } from '../utils/helper/index.js
  * @param {number} [pageSize=10] - The page size (optional, default is 10).
  * @returns {Promise<void>}
  */
-export async function fetchPoolsByType(bot, chatId, poolType, page = 1, pageSize = 10) {
+export async function fetchPoolsByType(poolType, page = 1, pageSize = 10) {
   const endpoint = `https://api-v3.raydium.io/pools/info/list`;
   const queryParams = {
     poolType: poolType,
@@ -94,16 +94,33 @@ export async function fetchPoolsByType(bot, chatId, poolType, page = 1, pageSize
     const pools = response.data.data;
 
     // Construct message with pool details
-    let message = `**${poolType.toUpperCase()} Pools:**\n\n`;
+    let items = [];
+    let title = '';
+
+    switch (poolType) {
+      case 'all':
+        title = '**All Pools:**\n\n';
+        break;
+      case 'concentrated':
+        title = '**Concentrated Pools:**\n\n';
+        break;
+      case 'standard':
+        title = '**Standard Pools:**\n\n';
+        break;
+      default:
+        break;
+    }
+
+    items.push(title);
     pools.forEach(pool => {
-      message += getPoolDetails(pool, poolType);
+      items.push(getPoolDetails(pool, poolType));
     });
 
+
     // Sending message with Markdown format for icons
-    bot.sendMessage(chatId, message, { parse_mode: 'Markdown' });
+    return items.join('\n');
   } catch (error) {
     console.error(`Failed to fetch ${poolType} pools:`, error);
-    bot.sendMessage(chatId, `Failed to fetch ${poolType} pools.`);
   }
 }
 

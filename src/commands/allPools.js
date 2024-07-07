@@ -10,6 +10,7 @@ import { fetchPoolsByType } from '../utils/index.js';
  * @param {number} [pageSize=10] - The page size (optional, default is 10).
  * @returns {Promise<void>}
  */
-export default async function allPools(bot, chatId, page = 1, pageSize = 10) {
-  fetchPoolsByType(bot, chatId, 'all', page, pageSize)
+export default async function allPools(page = 1, pageSize = 5) {
+  const message = await fetchPoolsByType('all', page, pageSize)
+  return message;
 }
